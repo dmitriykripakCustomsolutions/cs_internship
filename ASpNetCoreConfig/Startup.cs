@@ -1,3 +1,4 @@
+using ASpNetCoreConfig.Models;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.HttpsPolicy;
@@ -10,9 +11,10 @@ namespace ASpNetCoreConfig
 {
 	public class Startup
 	{
-		public Startup(IConfiguration configuration)
+		public Startup(IConfiguration configuration, IWebHostEnvironment environment)
 		{
-			Configuration = configuration;
+			var checker = environment;
+			Configuration = new ConfigurationBuilder().AddJsonFile($"appSettings.{environment.EnvironmentName}.json").Build();
 		}
 
 		public IConfiguration Configuration { get; }
