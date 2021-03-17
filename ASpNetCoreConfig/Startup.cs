@@ -9,6 +9,11 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
+using DataAccessLayer;
+using Microsoft.EntityFrameworkCore;
+using BusinessLayer.UserService;
+using System.Linq;
+using DataAccessLayer.Entities;
 
 namespace ASpNetCoreConfig
 {
@@ -25,6 +30,12 @@ namespace ASpNetCoreConfig
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
 		{
+
+			services.AddDbContext<ApplicationDbContext>(option =>
+			{
+				option.UseSqlServer(Configuration["SqlServerConnectionString"], b => b.MigrationsAssembly("DataAccessLayer"));
+			});
+
 			services.AddAuthentication(opt =>
 			{
 				opt.DefaultAuthenticateScheme = JwtBearerDefaults.AuthenticationScheme;
@@ -41,6 +52,9 @@ namespace ASpNetCoreConfig
 					IssuerSigningKey = new SymmetricSecurityKey(Encoding.UTF8.GetBytes("superSecretKey@345"))
 				};
 			});
+
+			services.AddScoped<IApplcationDbContext, ApplicationDbContext>();
+			services.AddScoped<IUserService, UserService>();
 
 
 			services.AddControllersWithViews();
@@ -76,6 +90,8 @@ namespace ASpNetCoreConfig
 			app.UseAuthentication();
 			app.UseAuthorization();
 
+			SeedDefaultUsers(app);
+
 			app.UseEndpoints(endpoints =>
 			{
 				endpoints.MapControllerRoute(
@@ -95,6 +111,46 @@ namespace ASpNetCoreConfig
 					spa.UseAngularCliServer(npmScript: "start");
 				}
 			});
+		}
+
+		private void SeedDefaultUsers(IApplicationBuilder app)
+		{
+			var scopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
+
+			using (var scope = scopeFactory.CreateScope())
+			{
+				var dbContext = scope.ServiceProvider.GetRequiredService<ApplicationDbContext>();
+
+				if(dbContext.Users.FirstOrDefault(u => u.FirstName == "John") == null)
+				{
+					User johnDoe = new User
+					{
+						FirstName = "John",
+						LastName = "Doe"
+					};
+
+					User bStroustrup = new User
+					{
+						FirstName = "Bjarne",
+						LastName = "Stroustrup"
+					};
+
+					User lTorvalds = new User
+					{
+						FirstName = "Linus",
+						LastName = "Torvalds"
+					};
+
+
+					dbContext.Users.Add(johnDoe);
+					dbContext.Users.Add(bStroustrup);
+					dbContext.Users.Add(lTorvalds);
+
+					dbContext.SaveChanges();
+
+				}
+
+			}
 		}
 	}
 }
