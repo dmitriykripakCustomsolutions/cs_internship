@@ -14,6 +14,7 @@ using Microsoft.EntityFrameworkCore;
 using BusinessLayer.UserService;
 using System.Linq;
 using DataAccessLayer.Entities;
+using BusinessLayer.ComputerService;
 
 namespace ASpNetCoreConfig
 {
@@ -55,6 +56,7 @@ namespace ASpNetCoreConfig
 
 			services.AddScoped<IApplcationDbContext, ApplicationDbContext>();
 			services.AddScoped<IUserService, UserService>();
+			services.AddScoped<IComputerService, ComputerService>();
 
 			services.AddSwaggerGen();
 

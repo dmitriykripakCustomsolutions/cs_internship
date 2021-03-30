@@ -9,6 +9,8 @@ namespace DataAccessLayer
 	public interface IApplcationDbContext
 	{
 		public DbSet<User> Users { get; set; }
+		public DbSet<ComputerManufacturer> ComputerManufacturers { get; set; }
+		public DbSet<ComputerModel> ComputerModels { get; set; }
 		int SaveChanges();
 	}
 }
