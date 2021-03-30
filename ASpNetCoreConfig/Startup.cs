@@ -56,6 +56,8 @@ namespace ASpNetCoreConfig
 			services.AddScoped<IApplcationDbContext, ApplicationDbContext>();
 			services.AddScoped<IUserService, UserService>();
 
+			services.AddSwaggerGen();
+
 
 			services.AddControllersWithViews();
 			// In production, the Angular files will be served from this directory
