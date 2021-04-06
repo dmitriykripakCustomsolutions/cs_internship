@@ -10,7 +10,7 @@ namespace DataAccessLayer.Entities
 		[DatabaseGenerated(DatabaseGeneratedOption.Identity)]
 		public string Id { get; set; }
 		public string ModelName { get; set; }
-
 		public string ComputerManufacturerId { get; set; }
+		public ICollection<ComputerModelTag> ComputerModelTags { get; set; }
 	}
 }

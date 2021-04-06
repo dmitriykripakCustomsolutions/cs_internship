@@ -17,5 +17,6 @@ namespace DataAccessLayer
 		public DbSet<User> Users { get; set; }
 		public DbSet<ComputerManufacturer> ComputerManufacturers { get; set; }
 		public DbSet<ComputerModel> ComputerModels { get; set; }
+		public DbSet<ComputerModelTag> ComputerModelTags { get; set; }
 	}
 }
