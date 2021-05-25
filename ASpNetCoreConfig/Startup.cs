@@ -20,7 +20,7 @@ using BusinessLayer.Lifecycle;
 
 namespace ASpNetCoreConfig
 {
-	public class Startup
+	public class Startup 
 	{
 		public Startup(IConfiguration configuration, IWebHostEnvironment environment)
 		{
