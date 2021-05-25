@@ -6,7 +6,7 @@ using System.Text;
 
 namespace DataAccessLayer
 {
-	public class ApplicationDbContext : DbContext, IApplcationDbContext
+	public class ApplicationDbContext : DbContext, IApplicationDbContext
 	{
 		public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options)
 			:base(options)

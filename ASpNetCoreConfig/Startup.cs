@@ -15,6 +15,8 @@ using BusinessLayer.UserService;
 using System.Linq;
 using DataAccessLayer.Entities;
 using BusinessLayer.ComputerService;
+using Microsoft.Extensions.Logging;
+using BusinessLayer.Lifecycle;
 
 namespace ASpNetCoreConfig
 {
@@ -30,8 +32,7 @@ namespace ASpNetCoreConfig
 
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
-		{
-
+		{			
 			services.AddDbContext<ApplicationDbContext>(option =>
 			{
 				option.UseSqlServer(Configuration["SqlServerConnectionString"], b => b.MigrationsAssembly("DataAccessLayer"));
@@ -54,9 +55,17 @@ namespace ASpNetCoreConfig
 				};
 			});
 
-			services.AddScoped<IApplcationDbContext, ApplicationDbContext>();
+			var serviceProvider = services.BuildServiceProvider();
+			var logger = serviceProvider.GetService<ILogger<object>>();
+			services.AddSingleton(typeof(ILogger), logger);
+
+			services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 			services.AddScoped<IUserService, UserService>();
 			services.AddScoped<IComputerService, ComputerService>();
+
+			services.AddScoped<IScopedInterface, LifecycleService>();
+			services.AddTransient<ITransientInterface, LifecycleService>();
+			services.AddSingleton<ISingletonInterface, LifecycleService>();
 
 			services.AddSwaggerGen();
 
@@ -94,6 +103,8 @@ namespace ASpNetCoreConfig
 			}
 
 			app.UseRouting();
+			app.UseCors(builder => builder.AllowAnyOrigin());
+
 			app.UseAuthentication();
 			app.UseAuthorization();
 

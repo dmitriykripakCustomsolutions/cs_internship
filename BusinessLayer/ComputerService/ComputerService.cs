@@ -1,6 +1,7 @@
-﻿using BusinessLayer.Models;
-using DataAccessLayer;
-using DataAccessLayer.Entities;
+﻿using AutoMapper;
+using BusinessLayer.Models;
+using IBoxer.DAL;
+using IBoxer.DAL.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
@@ -11,10 +12,24 @@ namespace BusinessLayer.ComputerService
 {
 	public class ComputerService : IComputerService
 	{
-		private readonly IApplcationDbContext _dbContext;
-		public ComputerService(IApplcationDbContext dbContext)
+		private readonly IApplicationDbContext _dbContext;
+		private readonly Mapper _autoMapper;
+		public ComputerService(IApplicationDbContext dbContext)
 		{
 			_dbContext = dbContext;
+
+			var mapperConfig = new MapperConfiguration(cfg =>
+			{
+				cfg.CreateMap<ComputerManufacturer, ComputerManufacturerDto>()
+				.ForMember(dest => dest.ComputerModels, opt => opt.MapFrom
+				(scr => scr.ComputerModels.Select(m => new ComputerModelDto
+				{
+					ModelName = m.ModelName
+				}))) ;
+			});
+
+			_autoMapper = new Mapper(mapperConfig);
+
 		}
 
 		public string AddManufacturer(ComputerManufacturerDto computerManufacturer)
@@ -58,20 +73,22 @@ namespace BusinessLayer.ComputerService
 		public List<ComputerManufacturerDto> GetComputerManufacturers()
 		{
 			var manufacturers = _dbContext.ComputerManufacturers.Include(c => c.ComputerModels).ToList();
-			var resultList = new List<ComputerManufacturerDto>();
 
-			foreach (var manufacturer in manufacturers)
-			{
-				resultList.Add(new ComputerManufacturerDto
-				{
-					ManufacturerName = manufacturer.ManufacturerName,
-					ComputerModels = manufacturer?.ComputerModels?.Select(model => new ComputerModelDto 
-					{
-					  ModelName = model.ModelName
-					}
-					).ToList()
-				});
-			}
+			var resultList = _autoMapper.Map<List<ComputerManufacturer>, List<ComputerManufacturerDto>>(manufacturers);
+			//var resultList = new List<ComputerManufacturerDto>();
+
+			//foreach (var manufacturer in manufacturers)
+			//{
+			//	resultList.Add(new ComputerManufacturerDto
+			//	{
+			//		ManufacturerName = manufacturer.ManufacturerName,
+			//		ComputerModels = manufacturer?.ComputerModels?.Select(model => new ComputerModelDto 
+			//		{
+			//		  ModelName = model.ModelName
+			//		}
+			//		).ToList()
+			//	});
+			//}
 
 			return resultList;
 		}

@@ -6,7 +6,7 @@ using System.Text;
 
 namespace DataAccessLayer
 {
-	public interface IApplcationDbContext
+	public interface IApplicationDbContext
 	{
 		public DbSet<User> Users { get; set; }
 		public DbSet<ComputerManufacturer> ComputerManufacturers { get; set; }

@@ -9,8 +9,8 @@ namespace BusinessLayer.UserService
 {
 	public class UserService : IUserService
 	{
-		private readonly IApplcationDbContext _dbContext;
-		public UserService(IApplcationDbContext dbContext)
+		private readonly IApplicationDbContext _dbContext;
+		public UserService(IApplicationDbContext dbContext)
 		{
 			_dbContext = dbContext;
 		}
