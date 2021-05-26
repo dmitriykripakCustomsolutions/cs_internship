@@ -1,7 +1,7 @@
 ﻿using AutoMapper;
 using BusinessLayer.Models;
-using IBoxer.DAL;
-using IBoxer.DAL.Entities;
+using DataAccessLayer;
+using DataAccessLayer.Entities;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;

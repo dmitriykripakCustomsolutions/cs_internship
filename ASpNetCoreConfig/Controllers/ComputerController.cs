@@ -5,7 +5,7 @@ using System.Threading.Tasks;
 using BusinessLayer.ComputerService;
 using BusinessLayer.Lifecycle;
 using BusinessLayer.Models;
-using IBoxer.DAL;
+using DataAccessLayer;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;

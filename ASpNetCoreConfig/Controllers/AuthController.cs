@@ -7,7 +7,6 @@ using System.Text;
 using System.Threading.Tasks;
 using ASpNetCoreConfig.Models;
 using BusinessLayer.ComputerService;
-using IBoxer.DAL;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
