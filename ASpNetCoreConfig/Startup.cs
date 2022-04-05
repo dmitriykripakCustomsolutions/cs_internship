@@ -14,10 +14,13 @@ using Microsoft.EntityFrameworkCore;
 using BusinessLayer.UserService;
 using System.Linq;
 using DataAccessLayer.Entities;
+using BusinessLayer.ComputerService;
+using Microsoft.Extensions.Logging;
+using BusinessLayer.Lifecycle;
 
 namespace ASpNetCoreConfig
 {
-	public class Startup
+	public class Startup 
 	{
 		public Startup(IConfiguration configuration, IWebHostEnvironment environment)
 		{
@@ -29,8 +32,7 @@ namespace ASpNetCoreConfig
 
 		// This method gets called by the runtime. Use this method to add services to the container.
 		public void ConfigureServices(IServiceCollection services)
-		{
-
+		{			
 			services.AddDbContext<ApplicationDbContext>(option =>
 			{
 				option.UseSqlServer(Configuration["SqlServerConnectionString"], b => b.MigrationsAssembly("DataAccessLayer"));
@@ -53,8 +55,19 @@ namespace ASpNetCoreConfig
 				};
 			});
 
-			services.AddScoped<IApplcationDbContext, ApplicationDbContext>();
+			var serviceProvider = services.BuildServiceProvider();
+			var logger = serviceProvider.GetService<ILogger<object>>();
+			services.AddSingleton(typeof(ILogger), logger);
+
+			services.AddScoped<IApplicationDbContext, ApplicationDbContext>();
 			services.AddScoped<IUserService, UserService>();
+			services.AddScoped<IComputerService, ComputerService>();
+
+			services.AddScoped<IScopedInterface, LifecycleService>();
+			services.AddTransient<ITransientInterface, LifecycleService>();
+			services.AddSingleton<ISingletonInterface, LifecycleService>();
+
+			services.AddSwaggerGen();
 
 
 			services.AddControllersWithViews();
@@ -71,6 +84,9 @@ namespace ASpNetCoreConfig
 			if (env.IsDevelopment())
 			{
 				app.UseDeveloperExceptionPage();
+
+				app.UseSwagger();
+				app.UseSwaggerUI();
 			}
 			else
 			{
@@ -87,10 +103,12 @@ namespace ASpNetCoreConfig
 			}
 
 			app.UseRouting();
+			app.UseCors(builder => builder.AllowAnyOrigin());
+
 			app.UseAuthentication();
 			app.UseAuthorization();
 
-			SeedDefaultUsers(app);
+			SeedDefaultData(app);
 
 			app.UseEndpoints(endpoints =>
 			{
@@ -113,7 +131,7 @@ namespace ASpNetCoreConfig
 			});
 		}
 
-		private void SeedDefaultUsers(IApplicationBuilder app)
+		private void SeedDefaultData(IApplicationBuilder app)
 		{
 			var scopeFactory = app.ApplicationServices.GetRequiredService<IServiceScopeFactory>();
 
@@ -150,6 +168,83 @@ namespace ASpNetCoreConfig
 
 				}
 
+				if(dbContext.ComputerManufacturers.FirstOrDefault() == null)
+				{
+					var computerManufacturerOne = new ComputerManufacturer
+					{
+						ManufacturerName = "Aser"
+					};
+					var computerManufacturerTwo = new ComputerManufacturer
+					{
+						ManufacturerName = "Toshiba"
+					};
+
+					dbContext.AddRange(computerManufacturerOne, computerManufacturerTwo);
+					dbContext.SaveChanges();
+
+					var computerModelAserOne = new ComputerModel
+					{
+						ModelName = "A1",
+						ComputerManufacturerId = computerManufacturerOne.Id
+					};
+
+					var computerModelAserTwo = new ComputerModel
+					{
+						ModelName = "A2",
+						ComputerManufacturerId = computerManufacturerOne.Id
+					};
+
+
+					var computerModelToshibaOne = new ComputerModel
+					{
+						ModelName = "Rapid",
+						ComputerManufacturerId = computerManufacturerTwo.Id
+					};
+
+					var computerModelToshibaTwo = new ComputerModel
+					{
+						ModelName = "More fast",
+						ComputerManufacturerId = computerManufacturerTwo.Id
+					};
+
+					dbContext.AddRange(computerModelAserOne, computerModelAserTwo, computerModelToshibaOne, computerModelToshibaTwo);
+					dbContext.SaveChanges();
+
+					//var asersTagOne = new ComputerModelTag
+					//{
+					//	TagName = "asersTagOne",
+					//	TagMeta = "asersTagOne_Meta",
+					//	TagExpiration = "4/6/2021",
+					//	ComputerModelId = computerModelAserOne.Id
+					//};
+					//var asersTagTwo = new ComputerModelTag
+					//{
+					//	TagName = "asersTagTwo",
+					//	TagMeta = "asersTagTwo_Meta",
+					//	TagExpiration = "4/18/2021",
+					//	ComputerModelId = computerModelAserOne.Id
+					//};
+					//var asersTagThree = new ComputerModelTag
+					//{
+					//	TagName = "asersTagThree",
+					//	TagMeta = "asersTagThree_Meta",
+					//	TagExpiration = "4/18/2025",
+					//	ComputerModelId = computerModelAserOne.Id
+					//};
+					//var asersTagFour = new ComputerModelTag
+					//{
+					//	TagName = "asersTagFour",
+					//	TagMeta = "asersTagFour_Meta",
+					//	TagExpiration = "4/18/2030",
+					//	ComputerModelId = computerModelAserOne.Id
+					//};
+
+
+					//dbContext.AddRange(asersTagOne, asersTagTwo, asersTagThree, asersTagFour);
+					//dbContext.SaveChanges();
+				}
+
+				var compModlesTagsExpanded = dbContext.ComputerModelTags.ToList();
 			}
 		}
 	}

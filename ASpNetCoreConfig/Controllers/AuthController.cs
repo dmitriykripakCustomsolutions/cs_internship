@@ -6,8 +6,10 @@ using System.Security.Claims;
 using System.Text;
 using System.Threading.Tasks;
 using ASpNetCoreConfig.Models;
+using BusinessLayer.ComputerService;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
 namespace ASpNetCoreConfig.Controllers
@@ -16,11 +18,20 @@ namespace ASpNetCoreConfig.Controllers
     [ApiController]
     public class AuthController : ControllerBase
     {
+        private readonly IComputerService _computerService;
+
+        public AuthController(IComputerService computerService)
+        {
+            _computerService = computerService;
+        }
+
         [HttpPost]
         [Route("login")]
         public IActionResult Login(LoginModel user)
         {
-            if(user == null)
+            var manufacturers = _computerService.GetComputerManufacturers();
+
+            if (user == null)
             {
                 return BadRequest("Invalid data");
             }
